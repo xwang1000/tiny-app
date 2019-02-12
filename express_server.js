@@ -30,3 +30,9 @@ app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
+
+app.get("/urls/:shortURL", (req, res) => {
+  const matchLongURL = urlDatabase[req.params.shortURL]
+  let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL };
+  res.render("urls_show", templateVars);
+});
