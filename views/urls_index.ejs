@@ -12,10 +12,10 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-  <header>
-    <% include ./partials/_header.ejs %>
-  </header>
-  <h2>My URLs</h2>
+  <% include ./partials/_header.ejs %>
+  <a href="#">Create New TinyURL</a>
+
+  <h4 style="margin: 20px 0">My URLs</h4>
   <ul>
     <% for (let urlID in urls) { %>
     <li>

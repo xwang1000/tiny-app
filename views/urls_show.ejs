@@ -9,9 +9,9 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-  <header>
-    <% include ./partials/_header.ejs %>
-  </header>
-  <h4><%= 'TinyURL for'+ longURL %></h4>
+  <% include ./partials/_header.ejs %>
+  <a href="#">Create New TinyURL</a>
+
+  <h4 style="margin: 20px 0"><%= 'TinyURL for '+ longURL %></h4>
   <p><%= shortURL %></p>
 </html>
