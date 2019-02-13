@@ -17,11 +17,15 @@
 
   <h4 style="margin: 20px 0">My URLs</h4>
   <ul>
-    <% for (let urlID in urls) { %>
+    <% for (let shortURL in urls) { %>
     <li>
-      <strong><%= urlID + ":"%></strong>
-      <span><%= urls[urlID] %></span>
-    
+      <strong><%= shortURL + ":"%></strong>
+      <span><%= urls[shortURL] %></span>
+      <!-- <form method="POST" action="/urls/b2xVn2/delete"> -->
+      <a href=<%="urls/"+shortURL%>>edit</a>
+      <form method="POST" action=<%="/urls/"+shortURL+"/delete"%>>
+        <input type="submit" value="delete"> 
+      </form>
     </li>
     <% } %>
   </ul>

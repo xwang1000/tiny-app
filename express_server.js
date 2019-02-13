@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -46,6 +46,13 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", {errors});
 });
 
+// take POST request and delete the corresponding record
+app.post('/urls/:shortURL/delete', (req,res) => {
+  const {shortURL} = req.params
+  delete urlDatabase[shortURL]
+  res.redirect('/urls')
+})
+
 app.get("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params
   const matchLongURL = urlDatabase[shortURL]
@@ -59,6 +66,13 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL };
   res.render("urls_show", templateVars);
 });
+
+app.post('/urls/:shortURL', (req, res) => {
+  const {longURL} = req.body
+  const {shortURL} = req.params
+  urlDatabase[shortURL] = longURL
+  res.redirect('/urls')
+})
 
 // Redirect any requests to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
