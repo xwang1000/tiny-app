@@ -2,6 +2,8 @@ var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
 
+const errors = []
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -35,21 +37,35 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  let shortURL = generateRandomString()
+  urlDatabase[shortURL] = req.body.longURL
+  res.redirect('/urls/' + shortURL);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  res.render("urls_new", {errors});
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const matchLongURL = urlDatabase[req.params.shortURL]
+  const {shortURL} = req.params
+  const matchLongURL = urlDatabase[shortURL]
+
+  // If going to an non-existent record
+  if(matchLongURL === undefined) {
+    errors.push(`The short url ${shortURL} does not exist.`)
+    res.redirect('/urls/new')
+    return 
+  }
   let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL };
   res.render("urls_show", templateVars);
+});
+
+// Redirect any requests to "/u/:shortURL" to its longURL
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]
+  res.redirect(longURL)
 });
 
 function generateRandomString() {
   return Math.random().toString(36).slice(6)
 }
-console.log(generateRandomString())
