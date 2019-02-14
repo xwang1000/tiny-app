@@ -4,27 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!-- My CSS -->
+    <link rel="stylesheet" href="../style.css">
 
     <title>New URL - TinyApp Example</title>
   </head>
 
-  <body style="font-size:20px; padding:50px;">
+  <body>
 
     <% include partials/_header %>
-    <h3>Create TinyURL</h3>
+    <h2>Creating TinyURL</h2>
     <%if (errors.length > 0) { %>
       <p class="alert-warning alert">
         <%= errors.pop()%>
       </p>
     <% } %>
-    <form class="form-inline" action="/urls" method="POST">
-      <div class="form-group mb-2">
-        <label for="longURL">Enter a URL:</label>
-        <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </form>
+    <div class="content-wrapper">
+      <form action="/urls" method="POST">
+        <div>
+          <span><img src="/bow.png" alt="Hello kitty bow" width="35px"></span>
+          <label for="longUrlInput">Enter a URL:</label>
+          <input  id="longUrlInput" class="form-input-text" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
+          <button class="button-submit" type="submit">Submit</button>
+        </div>
+      </form>
+    </div> 
   </body>
 </html>

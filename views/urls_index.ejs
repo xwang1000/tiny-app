@@ -4,31 +4,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="../style.css">
   <title>TinyApp</title>
 </head>
 
-<body style="font-size:20px; padding:50px;">
-  <% include ./partials/_header.ejs %>
-  <a href="/urls/new">Create New TinyURL</a>
+<body>
+<% include ./partials/_header.ejs %>
+<div class="button-wrapper">
+    <a href="/urls/new">
+    <div class="create-button">Create New TinyURL</div>
+  </a>
+</div>
+<h2 style="margin: 20px 0">My URLs</h2>
+<div class="table-wrapper">
+  <table>
+      <% for (let shortURL in urls) { %>
+        <tr>
+          <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
+          <td class="index-short-url"><%= shortURL%></td>
+          <td>=></td>
+          <td class="index-long-url"><%= urls[shortURL] %></td>
+          <td class="table-actions">
+            <a href=<%="urls/"+shortURL%>>edit</a> | 
+            <a href=<%="/urls/"+shortURL+"/delete"%>>delete</a>
+          </td>
+          
+        </tr>
+      <% } %>
+  </table>
+</div>
 
-  <h4 style="margin: 20px 0">My URLs</h4>
-  <ul>
-    <% for (let shortURL in urls) { %>
-    <li>
-      <strong><%= shortURL + ":"%></strong>
-      <span><%= urls[shortURL] %></span>
-      <!-- <form method="POST" action="/urls/b2xVn2/delete"> -->
-      <a href=<%="urls/"+shortURL%>>edit</a>
-      <form method="POST" action=<%="/urls/"+shortURL+"/delete"%>>
-        <input type="submit" value="delete"> 
-      </form>
-    </li>
-    <% } %>
-  </ul>
+
+
 </body>
 
 </html>

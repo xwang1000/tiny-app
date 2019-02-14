@@ -1,0 +1,121 @@
+body {
+  background-color: white;
+  font-family: 'Opan Sans', Arial, sans-serif;
+  color: grey;
+  font-weight: 300;
+  font-size: 20px;
+}
+
+h2 {
+  font-weight: 300;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  text-align: center;
+  font-family: 'Opan Sans', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 1.8rem;
+  color: #0054ae;
+  margin-bottom: 0;
+  padding: 20px;
+  padding-bottom: 0;
+}
+
+.header-title {
+  flex: 1;
+}
+
+.header-images {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.header-image {
+  width: 80px;
+  height: auto;
+  opacity: .85;
+  padding: 0;
+}
+
+.header-melody {
+  width: 70px;
+  height: auto;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.create-button {
+  background-color: #0054ae;
+  color: white;
+  opacity: 0.6;
+  width: 260px;
+  padding: 10px 20px;
+  border-radius: 15px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.create-button:hover {
+  transform: scale(1.03);
+  transition: transform 0.5s ease;
+}
+
+.button-submit {
+  background-color: #0054ae;
+  color: white;
+  opacity: 0.6;
+  width: 100px;
+  padding: 10px 20px;
+  border-radius: 15px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.form-input-text {
+  font-size: 1.1rem;
+  padding: 5px;
+  border: 1px solid grey;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+table {
+  border: 6px solid lightblue;
+  border-radius: 10px;
+  text-align: left;
+  padding: 10px;
+}
+
+td, th {
+  padding: 10px;
+}
+
+.table-actions {
+  color: #0054ae;
+}
+
+.index-short-url {
+  font-weight: 700;
+}
+
+.table-wrapper, .form-wrapper, content-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+}

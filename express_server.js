@@ -11,7 +11,9 @@ app.set('view engine', 'ejs');
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.google.com",
+  "9sws9x": "http://www.dribbble.com",
+  "daf923": "https://twitter.com/hellokitty"
 };
 
 app.get("/", (req, res) => {
@@ -47,7 +49,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 // take POST request and delete the corresponding record
-app.post('/urls/:shortURL/delete', (req,res) => {
+app.get('/urls/:shortURL/delete', (req,res) => {
   const {shortURL} = req.params
   delete urlDatabase[shortURL]
   res.redirect('/urls')
@@ -79,6 +81,8 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL)
 });
+
+app.use(express.static('public'))
 
 function generateRandomString() {
   return Math.random().toString(36).slice(6)

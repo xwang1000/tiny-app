@@ -3,23 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="../style.css">
   <title>TinyApp</title>
 </head>
-
 <body style="font-size:20px; padding:50px;">
   <% include ./partials/_header.ejs %>
-  <a href="/urls/new">Create New TinyURL</a>
-
-  <h4 style="margin: 20px 0"><%= 'TinyURL for '+ longURL %></h4>
-  <p><%= shortURL %></p>
-
-  <form class="form-inline" action=<%="/urls/"+shortURL%> method="POST">
-    <div class="form-group mb-2">
-      <label for="longURL">Enter a new URL:</label>
-      <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
-      <button type="submit" class="btn btn-primary">Submit</button>
+  <content-wrapper>
+    <div class="create-button">
+      <a href="/urls/new">Create New TinyURL</a>
     </div>
-  </form>
+    
+    <h2 style="margin: 20px 0"><%= 'TinyURL for '+ longURL %></h2>
+    <p><%= shortURL %></p>
+  </content-wrapper>
+  <div class="form-wrapper">
+    <form action=<%="/urls/"+shortURL%> method="POST">
+      <div>
+        <label for="longUrlInput">Enter a new URL:</label>
+        <input class="form-input-text" id="longUrlInput" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
+        <button class="button-submit" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</body>
 </html>
