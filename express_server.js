@@ -29,6 +29,7 @@ app.set('view engine', 'ejs');
 app.use(morgan('dev'))
 
 // Database
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -36,9 +37,22 @@ const urlDatabase = {
   "daf923": "https://twitter.com/hellokitty"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 app.use((req, res, next) => {
   res.locals = {
-    username: req.cookies['username']
+    user_id: req.cookies['user_id']
   }
   next()
 });
@@ -103,15 +117,54 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const {username} = req.body;
-  res.cookie('username', username);
+  const {email, password} = req.body;
+  const sampleUser = users['userRandomID']
 
+  // user authentication
+  for (const userId in users) {
+    const user = users[userId]
+    if (email === user.email && password === user.password) {
+      res.cookie('user_id', 'userRandomID');
+    } else {
+      res.send('Incorrect login credentials.')
+    }
+  }
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect('/urls');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.post('/register', (req, res) => {
+  const {email, password} = req.body;
+
+  // handling empty entries
+  if (email === '' && password === '') {
+    res.status(400).send('Empty email or password field. Please fill them up.')
+    next()
+  }
+
+  // handling existing entries
+  if (isEmailExisiting(email)) {
+    res.status(400).send('This email already exists.')
+    next()   
+  }
+  const newId = getRandomId();
+  // add user
+  users[newId] = {
+    id: newId,
+    email,
+    password
+  }
+  // set cookie
+  res.cookie('user_id', newId)
+  res.redirect('/urls')
 });
 
 // Start server...
@@ -122,4 +175,17 @@ app.listen(PORT, () => {
 
 function generateRandomString() {
   return Math.random().toString(36).slice(6)
+}
+ 
+function getRandomId() {
+  return Math.random().toString(36).slice(5)
+}
+
+function isEmailExisiting(email) {
+  for (const userId in users) {
+    if (users.hasOwnProperty(userId) && email === users[userId].email) {
+      return true
+    }
+  }
+  return false;
 }
