@@ -3,16 +3,12 @@
     <% if (user_id !== undefined) { %>
       <form class="login-form login-form-loggedin" action="/logout" method="POST">
         <label class="login-alert">User id <%= user_id %> is signed in.</label>
-        <button class="button-submit button-logout" type="submit">log out</button>
+        <button class="button-header" type="submit">log out</button>
       </form>
 
     <% } else {%>
-      <form class="login-form login-form--login" action="/login" method="POST">
-        <input id="email" class="form-input-announcement form-email" type="text" name="email" placeholder="email">
-        <input id="password" class="form-input-announcement" type="password" name="password" placeholder="password">
-        <button class="button-submit button-login" type="submit">sign in</button>
-      </form>
-      <a href="/register"><button class="button-register button-submit">register</button></a>
+      <a href="/login"><button class="button-header">sign in</button></a>
+      <a href="/register"><button class="button-header">register</button></a>
     <%}%>
     
   </div>

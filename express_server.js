@@ -38,13 +38,13 @@ const urlDatabase = {
 };
 
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "user23f": {
+    id: "user13f", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+ "user2134": {
+    id: "user2134", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
@@ -116,20 +116,25 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get('/login', (req, res) => {
+  res.render('login')
+})
+
 app.post('/login', (req, res) => {
   const {email, password} = req.body;
-  const sampleUser = users['userRandomID']
+  const user = users['userRandomID']
 
   // user authentication
   for (const userId in users) {
     const user = users[userId]
+
     if (email === user.email && password === user.password) {
-      res.cookie('user_id', 'userRandomID');
+      res.cookie('user_id', 'userID');
+      res.redirect('/urls');
     } else {
-      res.send('Incorrect login credentials.')
+      res.send('Incorrect login credentials.');
     }
   }
-  res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
@@ -145,7 +150,7 @@ app.post('/register', (req, res) => {
   const {email, password} = req.body;
 
   // handling empty entries
-  if (email === '' && password === '') {
+  if (email === '' || password === '') {
     res.status(400).send('Empty email or password field. Please fill them up.')
     next()
   }
