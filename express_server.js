@@ -1,36 +1,56 @@
-var express = require("express");
-var app = express();
-var PORT = 8080; // default port 8080
-
-const errors = []
-
+// Modules
+const express = require("express");
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
+const morgan = require('morgan');
+const colors = require('colors')
+const PORT = 8080;
+const errors = [];
+
+// Server init
+
+var app = express();
+
+// Middlewares
+
+// Get POST body
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Parse cookies
+app.use(cookieParser());
+
+// Set static assets folder
+app.use(express.static('public'));
+
+// Set view engine
 app.set('view engine', 'ejs');
 
-var urlDatabase = {
+// Request logging
+app.use(morgan('dev'))
+
+// Database
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
   "9sws9x": "http://www.dribbble.com",
   "daf923": "https://twitter.com/hellokitty"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
+app.use((req, res, next) => {
+  res.locals = {
+    username: req.cookies['username']
+  }
+  next()
 });
 
-app.listen(PORT, () => {
-  console.log(`TinyApp listening on port ${PORT}!`);
+// Set routes
+
+app.get("/", (req, res) => {
+  res.render('home');
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  let templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
 });
 
 app.get("/urls", (req, res) => {
@@ -65,24 +85,40 @@ app.get("/urls/:shortURL", (req, res) => {
     res.redirect('/urls/new')
     return 
   }
-  let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL };
+  let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL};
   res.render("urls_show", templateVars);
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  const {longURL} = req.body
-  const {shortURL} = req.params
-  urlDatabase[shortURL] = longURL
-  res.redirect('/urls')
-})
+  const {longURL} = req.body;
+  const {shortURL} = req.params;
+  urlDatabase[shortURL] = longURL;
+  res.redirect('/urls');
+});
 
 // Redirect any requests to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]
-  res.redirect(longURL)
+  res.redirect(longURL);
 });
 
-app.use(express.static('public'))
+app.post('/login', (req, res) => {
+  const {username} = req.body;
+  res.cookie('username', username);
+
+  res.redirect('/urls');
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username')
+  res.redirect('/urls');
+});
+
+// Start server...
+
+app.listen(PORT, () => {
+  console.log(`TinyApp listening on port ${PORT}!`);
+});
 
 function generateRandomString() {
   return Math.random().toString(36).slice(6)

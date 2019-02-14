@@ -1,7 +1,25 @@
 <div class="header">
-  <h1 class="header-title">
-    <span><img class="header-image" src="../hellokitty.png" alt="Hello Kitty"></span>
-    TinyApp
-    <span><img class="header-image header-melody" src="../melody.png" alt="Melody and her friend."></span>
-  </h1>
+  <div class="header-announcement">
+    <% if (username !== undefined) { %>
+      <form class="login-form login-form-loggedin" action="/logout" method="POST">
+        <label class="login-alert"><%= username %> is signed in.</label>
+        <button class="button-submit button-logout" type="submit">log out</button>
+      </form>
+
+    <% } else {%>
+      <form class="login-form login-form--login" action="/login" method="POST">
+        <input id="username" class="form-input-announcement" type="text" name="username" placeholder="username">
+        <button class="button-submit button-login" type="submit">sign in</button>
+      </form>
+    <%}%>
+    
+  </div>
+
+  <div class="header-content">
+    <h1 class="header-title">
+        <span><img class="header-image" src="../hellokitty.png" alt="Hello Kitty"></span>
+        <a href="/urls">TinyApp</a>
+        <span><img class="header-image header-melody" src="../melody.png" alt="Melody and her friend."></span>
+    </h1>
+  </div>
 </div>

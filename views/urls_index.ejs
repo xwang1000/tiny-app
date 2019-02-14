@@ -10,33 +10,30 @@
 </head>
 
 <body>
-<% include ./partials/_header.ejs %>
-<div class="button-wrapper">
+  <% include ./partials/_header.ejs %>
+  <div class="button-wrapper">
     <a href="/urls/new">
-    <div class="create-button">Create New TinyURL</div>
-  </a>
-</div>
-<h2 style="margin: 20px 0">My URLs</h2>
-<div class="table-wrapper">
-  <table>
+      <div class="button-create button">Create New TinyURL</div>
+    </a>
+  </div>
+  <h2 style="margin: 20px 0">My URLs</h2>
+  <div class="table-wrapper">
+    <table>
       <% for (let shortURL in urls) { %>
-        <tr>
-          <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
-          <td class="index-short-url"><%= shortURL%></td>
-          <td>=></td>
-          <td class="index-long-url"><%= urls[shortURL] %></td>
-          <td class="table-actions">
-            <a href=<%="urls/"+shortURL%>>edit</a> | 
-            <a href=<%="/urls/"+shortURL+"/delete"%>>delete</a>
-          </td>
-          
-        </tr>
+      <tr>
+        <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
+        <td class="index-short-url"><%= shortURL%></td>
+        <td>=></td>
+        <td class="index-long-url"><%= urls[shortURL] %></td>
+        <td class="table-actions">
+          <a href=<%="urls/"+shortURL%>>edit</a> |
+          <a href=<%="/urls/"+shortURL+"/delete"%>>delete</a>
+        </td>
+
+      </tr>
       <% } %>
-  </table>
-</div>
-
-
-
+    </table>
+  </div>
 </body>
 
 </html>
