@@ -2,7 +2,7 @@
   <div class="header-announcement">
     <% if (user !== undefined) { %>
       <form class="login-form login-form-loggedin" action="/logout" method="POST">
-        <label class="login-alert">you are logged in as <%= user.email %></label>
+        <label class="login-alert">logged in as: <%= user.email %></label>
         <button class="button-header" type="submit">log out</button>
       </form>
 

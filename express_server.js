@@ -127,16 +127,21 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   const {email, password} = req.body
+
   // find user using email
   const currentUser = getUserByEmail(email)
 
-  // check if the input password === user.password
-  if (password === currentUser.password) {
-    res.cookie('user', currentUser)
-    res.redirect('/urls')
+  if(!currentUser) {
+    res.status(403).send(`Cannot find user registered with ${email}.`)
+  } else {
+    // check if the input password === user.password
+    if (password === currentUser.password) {
+      res.cookie('user', currentUser)
+      res.redirect('/urls')
+    } else {
+      res.status(403).send('Wrong password.')
+    }
   }
-  // set cookie 'user', user. redirect
-
 });
 
 app.post('/logout', (req, res) => {
