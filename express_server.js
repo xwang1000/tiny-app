@@ -73,13 +73,14 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase}
+  const templateVars = { urls: urlDatabase, user: req.cookies.user}
   res.render("urls_index", templateVars)
+
 })
 
 // Needs revision -> creating new url form
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString()
+  const shortURL = generateRandomString()
   urlDatabase[shortURL] = {
     longURL: req.body.longURL, 
     userID: req.cookies.user.id
@@ -97,38 +98,38 @@ app.get("/urls/new", (req, res) => {
 });
 
 // take POST request and delete the corresponding record
-app.get('/urls/:shortURL/delete', (req,res) => {
-  const {shortURL} = req.params
-  delete urlDatabase[shortURL]
+app.get('/urls/:id/delete', (req,res) => {
+  const {id} = req.params
+  delete urlDatabase[id]
   res.redirect('/urls')
 })
 
-app.get("/urls/:shortURL", (req, res) => {
-  const {shortURL} = req.params
-  const matchLongURL = urlDatabase[shortURL]['longURL']
+app.get("/urls/:id", (req, res) => {
+  const {id} = req.params
+  const matchLongURL = urlDatabase[id].longURL
 
   // If going to an non-existent record
   if(matchLongURL === undefined) {
-    errors.push(`The short url ${shortURL} does not exist.`)
+    errors.push(`The short url ${id} does not exist.`)
     res.redirect('/urls/new')
     return 
   }
-  let templateVars = { shortURL: req.params.shortURL, longURL: matchLongURL};
-  res.render("urls_show", templateVars);
-});
+  let templateVars = { shortURL: id, longURL: matchLongURL};
+  res.render("urls_show", templateVars)
+})
 
 app.post('/urls/:shortURL', (req, res) => {
-  const {longURL} = req.body;
-  const {shortURL} = req.params;
-  urlDatabase[shortURL] = longURL;
-  res.redirect('/urls');
-});
+  const {longURL} = req.body
+  const {id} = req.params
+  urlDatabase[id].longURL = longURL
+  res.redirect('/urls')
+})
 
 // Redirect any requests to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
-  res.redirect(longURL);
-});
+  const longURL = urlDatabase[req.params.shortURL].longURL
+  res.redirect(longURL)
+})
 
 app.get('/login', (req, res) => {
   res.render('login')

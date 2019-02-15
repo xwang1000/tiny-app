@@ -16,24 +16,35 @@
       <div class="button-create button">Create New TinyURL</div>
     </a>
   </div>
-  <h2 style="margin: 20px 0">My URLs</h2>
-  <div class="table-wrapper">
-    <table>
-      <% for (let shortURL in urls) { %>
+  <% if (user) { %>  
+    <div class="table-wrapper">
+      <h2 style="margin: 20px 0">My URLs</h2>
+      <table>
+      <% for (let id in urls) { %>
       <tr>
         <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
-        <td class="index-short-url"><%= shortURL%></td>
+        <td class="index-short-url"><%= id%></td>
         <td>=></td>
-        <td class="index-long-url"><%= urls[shortURL] %></td>
+        <td class="index-long-url"><%= urls[id].longURL %></td>
         <td class="table-actions">
-          <a href=<%="urls/"+shortURL%>>edit</a> |
-          <a href=<%="/urls/"+shortURL+"/delete"%>>delete</a>
+          <a href=<%="urls/"+id%>>edit</a> |
+          <a href=<%="/urls/"+id+"/delete"%>>delete</a>
         </td>
-
       </tr>
       <% } %>
     </table>
   </div>
+  <% } else {%>
+    <h2>sign in to view your teeny tiny urls!</h2>
+    <div class="form-wrapper">
+      <form class="login-form login-form--login" action="/login" method="POST">
+        <input id="email" class="form-input-login" type="text" name="email" placeholder="email">
+        <input id="password" class="form-input-login" type="password" name="password" placeholder="password">
+        <button class="button-submit button-login" type="submit">sign in</button>
+      </form>
+    </div>
+
+  <% } %>
 </body>
 
 </html>
