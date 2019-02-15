@@ -1,41 +1,49 @@
 // Modules
-const express = require("express");
-const cookieParser = require('cookie-parser');
-const bodyParser = require("body-parser");
-const morgan = require('morgan');
+const express = require("express")
+const cookieParser = require('cookie-parser')
+const bodyParser = require("body-parser")
+const morgan = require('morgan')
 const colors = require('colors')
-const PORT = 8080;
-const errors = [];
+const PORT = 8080
+const errors = []
 
 // Server init
 
-var app = express();
+var app = express()
 
 // Middlewares
 
 // Get POST body
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true}))
 
 // Parse cookies
-app.use(cookieParser());
+app.use(cookieParser())
 
 // Set static assets folder
-app.use(express.static('public'));
+app.use(express.static('public'))
 
 // Set view engine
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs')
 
 // Request logging
 app.use(morgan('dev'))
 
+const isAuthenticated = (req, res, next) => {
+  if (req.cookies.user) {
+    next()
+  } else {
+    res.redirect('/login')
+  }
+}
+
 // Database
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "user13f" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "user13f" },
-  daffdk: { longURL: "http://www.dribbble.com", userID: 'user345'},
-  daf923: { longURL: "https://twitter.com/hellokitty", userID: 'user345'}
-};
+  b6UTxQ: { longURL: "https://www.tsn.ca", shortURL: "b6UTxQ", userID: "user13f" },
+  i3BoGr: { longURL: "https://www.google.ca", shortURL: "i3BoGr", userID: "user13f" },
+  daffdk: { longURL: "http://www.dribbble.com", shortURL: "daffdk", userID: 'user345'},
+  daf923: { longURL: "https://twitter.com/hellokitty", shortURL: "daf923", userID: 'user345'}
+}
 
 const users = { 
   "user13f": {
@@ -60,22 +68,24 @@ app.use((req, res, next) => {
     user: req.cookies['user']
   }
   next()
-});
+})
 
 // Set routes
 
 app.get("/", (req, res) => {
-  res.render('home');
-});
+  res.render('home')
+})
 
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+  res.json(urlDatabase)
+})
 
-app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: req.cookies.user}
-  res.render("urls_index", templateVars)
-
+// Protect the route using middleware
+app.get("/urls", isAuthenticated, (req, res) => {
+  res.render('urls_index', {
+    urls: getVisibleUrls(req.cookies.user.id),
+    user: req.cookies.user
+  })
 })
 
 // Needs revision -> creating new url form
@@ -85,8 +95,8 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL, 
     userID: req.cookies.user.id
   }
-  res.redirect('/urls/' + shortURL);
-});
+  res.redirect('/urls/' + shortURL)
+})
 
 app.get("/urls/new", (req, res) => {
   const {user} = req.cookies
@@ -95,7 +105,7 @@ app.get("/urls/new", (req, res) => {
   } else {
     res.redirect('/login')
   }
-});
+})
 
 // take POST request and delete the corresponding record
 app.get('/urls/:id/delete', (req,res) => {
@@ -114,7 +124,7 @@ app.get("/urls/:id", (req, res) => {
     res.redirect('/urls/new')
     return 
   }
-  let templateVars = { shortURL: id, longURL: matchLongURL};
+  let templateVars = { shortURL: id, longURL: matchLongURL}
   res.render("urls_show", templateVars)
 })
 
@@ -152,19 +162,19 @@ app.post('/login', (req, res) => {
       res.status(403).send('Wrong password.')
     }
   }
-});
+})
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user')
-  res.redirect('/urls');
-});
+  res.redirect('/urls')
+})
 
 app.get('/register', (req, res) => {
-  res.render('register');
-});
+  res.render('register')
+})
 
 app.post('/register', (req, res) => {
-  const {email, password} = req.body;
+  const {email, password} = req.body
 
   // handling empty entries
   if (email === '' || password === '') {
@@ -177,7 +187,7 @@ app.post('/register', (req, res) => {
     res.status(400).send('This email already exists.')
     next()   
   }
-  const newId = getRandomId();
+  const newId = getUId()
   // add user
   users[newId] = {
     id: newId,
@@ -187,20 +197,21 @@ app.post('/register', (req, res) => {
   // set cookie
   res.cookie('user', users[newId])
   res.redirect('/urls')
-});
+})
 
 // Start server...
 
 app.listen(PORT, () => {
-  console.log(`TinyApp listening on port ${PORT}!`);
-});
+  console.log(`TinyApp listening on port ${PORT}!`)
+})
 
 const generateRandomString = () => {
   return Math.random().toString(36).slice(6)
 }
  
-const getRandomId = () => {
-  return Math.random().toString(36).slice(5)
+let id = 0
+const getUId = () => {
+  return id++
 }
 
 const isEmailExisiting = email => {
@@ -209,7 +220,7 @@ const isEmailExisiting = email => {
       return true
     }
   }
-  return false;
+  return false
 }
 
 const getUserByEmail = email => {
@@ -219,4 +230,16 @@ const getUserByEmail = email => {
     }
   }
   return undefined
+}
+
+// Could be more eloquent using Array.reduce()
+// Look up with given userID, return a list of visible url objects
+const getVisibleUrls = userID => {
+  const visibleUrls = []
+  for (const urlID in urlDatabase) {
+    if (urlDatabase.hasOwnProperty(urlID) && userID === urlDatabase[urlID].userID) {
+      visibleUrls.push(urlDatabase[urlID])
+    }
+  }
+  return visibleUrls
 }

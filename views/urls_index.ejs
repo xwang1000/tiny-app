@@ -11,27 +11,28 @@
 
 <body>
   <% include ./partials/_header.ejs %>
-  <div class="button-wrapper">
-    <a href="/urls/new">
-      <div class="button-create button">Create New TinyURL</div>
-    </a>
-  </div>
+
   <% if (user) { %>  
+    <div class="button-wrapper">
+      <a href="/urls/new">
+        <div class="button-create button">Create New TinyURL</div>
+      </a>
+    </div>
     <div class="table-wrapper">
       <h2 style="margin: 20px 0">My URLs</h2>
       <table>
-      <% for (let id in urls) { %>
+      <% urls.forEach(url => {  %>
       <tr>
         <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
-        <td class="index-short-url"><%= id%></td>
+        <td class="index-short-url"><%= url.shortURL%></td>
         <td>=></td>
-        <td class="index-long-url"><%= urls[id].longURL %></td>
+        <td class="index-long-url"><%= url.longURL %></td>
         <td class="table-actions">
-          <a href=<%="urls/"+id%>>edit</a> |
-          <a href=<%="/urls/"+id+"/delete"%>>delete</a>
+          <a href=<%="urls/"+url.shortURL%>>edit</a> |
+          <a href=<%="/urls/"+url.shortURL+"/delete"%>>delete</a>
         </td>
       </tr>
-      <% } %>
+      <% }) %>
     </table>
   </div>
   <% } else {%>
