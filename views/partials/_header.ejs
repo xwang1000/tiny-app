@@ -1,8 +1,8 @@
 <div class="header">
   <div class="header-announcement">
-    <% if (user_id !== undefined) { %>
+    <% if (user !== undefined) { %>
       <form class="login-form login-form-loggedin" action="/logout" method="POST">
-        <label class="login-alert">User id <%= user_id %> is signed in.</label>
+        <label class="login-alert">you are logged in as <%= user.email %></label>
         <button class="button-header" type="submit">log out</button>
       </form>
 

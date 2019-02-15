@@ -47,12 +47,17 @@ const users = {
     id: "user2134", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+  'user345': {
+    id: 'user345',
+    email: 'test@test.com',
+    password: 'test'
   }
 }
 
 app.use((req, res, next) => {
   res.locals = {
-    user_id: req.cookies['user_id']
+    user: req.cookies['user']
   }
   next()
 });
@@ -121,24 +126,21 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-  const {email, password} = req.body;
-  const user = users['userRandomID']
+  const {email, password} = req.body
+  // find user using email
+  const currentUser = getUserByEmail(email)
 
-  // user authentication
-  for (const userId in users) {
-    const user = users[userId]
-
-    if (email === user.email && password === user.password) {
-      res.cookie('user_id', 'userID');
-      res.redirect('/urls');
-    } else {
-      res.send('Incorrect login credentials.');
-    }
+  // check if the input password === user.password
+  if (password === currentUser.password) {
+    res.cookie('user', currentUser)
+    res.redirect('/urls')
   }
+  // set cookie 'user', user. redirect
+
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id')
+  res.clearCookie('user')
   res.redirect('/urls');
 });
 
@@ -168,7 +170,7 @@ app.post('/register', (req, res) => {
     password
   }
   // set cookie
-  res.cookie('user_id', newId)
+  res.cookie('user', users[newId])
   res.redirect('/urls')
 });
 
@@ -178,19 +180,28 @@ app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}!`);
 });
 
-function generateRandomString() {
+const generateRandomString = () => {
   return Math.random().toString(36).slice(6)
 }
  
-function getRandomId() {
+const getRandomId = () => {
   return Math.random().toString(36).slice(5)
 }
 
-function isEmailExisiting(email) {
+const isEmailExisiting = email => {
   for (const userId in users) {
     if (users.hasOwnProperty(userId) && email === users[userId].email) {
       return true
     }
   }
   return false;
+}
+
+const getUserByEmail = email => {
+  for (const userId in users) {
+    if (users.hasOwnProperty(userId) && email === users[userId].email) {
+      return users[userId]
+    }
+  }
+  return undefined
 }
