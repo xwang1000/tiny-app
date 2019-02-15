@@ -31,14 +31,14 @@ app.use(morgan('dev'))
 // Database
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-  "9sws9x": "http://www.dribbble.com",
-  "daf923": "https://twitter.com/hellokitty"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "user13f" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "user13f" },
+  daffdk: { longURL: "http://www.dribbble.com", userID: 'user345'},
+  daf923: { longURL: "https://twitter.com/hellokitty", userID: 'user345'}
 };
 
 const users = { 
-  "user23f": {
+  "user13f": {
     id: "user13f", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
@@ -73,18 +73,27 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase};
-  res.render("urls_index", templateVars);
-});
+  let templateVars = { urls: urlDatabase}
+  res.render("urls_index", templateVars)
+})
 
+// Needs revision -> creating new url form
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString()
-  urlDatabase[shortURL] = req.body.longURL
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL, 
+    userID: req.cookies.user.id
+  }
   res.redirect('/urls/' + shortURL);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", {errors});
+  const {user} = req.cookies
+  if (user) {
+    res.render("urls_new", {errors})
+  } else {
+    res.redirect('/login')
+  }
 });
 
 // take POST request and delete the corresponding record
@@ -96,7 +105,7 @@ app.get('/urls/:shortURL/delete', (req,res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params
-  const matchLongURL = urlDatabase[shortURL]
+  const matchLongURL = urlDatabase[shortURL]['longURL']
 
   // If going to an non-existent record
   if(matchLongURL === undefined) {
