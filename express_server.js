@@ -83,7 +83,7 @@ app.get("/urls.json", (req, res) => {
 // Protect the route using middleware
 app.get("/urls", isAuthenticated, (req, res) => {
   res.render('urls_index', {
-    urls: getVisibleUrls(req.cookies.user.id),
+    urls: getEntriesByPropertyValue(urlDatabase, 'userID', req.cookies.user.id),
     user: req.cookies.user
   })
 })
@@ -108,24 +108,28 @@ app.get("/urls/new", (req, res) => {
 })
 
 // take POST request and delete the corresponding record
-app.get('/urls/:id/delete', (req,res) => {
-  const {id} = req.params
-  delete urlDatabase[id]
+app.get('/urls/:shortURL/delete', isAuthenticated, (req,res) => {
+  const {shortURL} = req.params
+  delete urlDatabase[shortURL]
   res.redirect('/urls')
 })
 
-app.get("/urls/:id", (req, res) => {
-  const {id} = req.params
-  const matchLongURL = urlDatabase[id].longURL
-
+app.get("/urls/:shortURL", (req, res) => {
+  const {shortURL} = req.params
+  const urls = getEntriesByPropertyValue(urlDatabase, 'shortURL', shortURL)
+  const currentUser = req.cookies.user
+  console.log(currentUser)
   // If going to an non-existent record
-  if(matchLongURL === undefined) {
-    errors.push(`The short url ${id} does not exist.`)
-    res.redirect('/urls/new')
-    return 
+  if (urls.length === 0) {
+    errors.push(`The short url ${shortURL} does not exist.`)
+  } else if (currentUser.id !== urls[0].userID) {
+    errors.push(`oops, seems like you are not authorized to access this url.`)
   }
-  let templateVars = { shortURL: id, longURL: matchLongURL}
-  res.render("urls_show", templateVars)
+  const templateVar = {
+    url: urls[0],
+    errors
+  }
+  res.render("urls_show", templateVar)
 })
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -234,12 +238,21 @@ const getUserByEmail = email => {
 
 // Could be more eloquent using Array.reduce()
 // Look up with given userID, return a list of visible url objects
-const getVisibleUrls = userID => {
-  const visibleUrls = []
-  for (const urlID in urlDatabase) {
-    if (urlDatabase.hasOwnProperty(urlID) && userID === urlDatabase[urlID].userID) {
-      visibleUrls.push(urlDatabase[urlID])
-    }
-  }
-  return visibleUrls
+// const getVisibleUrls = userID => {
+//   const visibleUrls = []
+//   for (const urlID in urlDatabase) {
+//     if (urlDatabase.hasOwnProperty(urlID) && userID === urlDatabase[urlID].userID) {
+//       visibleUrls.push(urlDatabase[urlID])
+//     }
+//   }
+//   return visibleUrls
+// }
+
+const objectToArray = object => (Object.keys(object).map(key => object[key]))
+
+// returns all entries whose given property equals given value
+const getEntriesByPropertyValue = (database, property, value) => {
+  return objectToArray(database).reduce((newEntries, entry) => {
+    return entry[property] === value ? [ ...newEntries, entry ] : newEntries
+  }, [])
 }
