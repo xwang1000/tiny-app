@@ -142,8 +142,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post('/urls/:shortURL', (req, res) => {
   const {longURL} = req.body
-  const {id} = req.params
-  urlDatabase[id].longURL = longURL
+  const {shortURL} = req.params
+
+  // console.log(urlDatabase[shortURL].longURL)
+  urlDatabase[shortURL].longURL = longURL
   res.redirect('/urls')
 })
 
@@ -166,7 +168,6 @@ app.post('/login', (req, res) => {
 
   // find user using email
   const [currentUser] = getEntriesByPropertyValue(users, 'email', email)
-
   if(!currentUser) {
     res.status(403).send(`Cannot find user registered with ${email}.`)
   } else {

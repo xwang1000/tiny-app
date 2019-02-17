@@ -24,9 +24,10 @@
       <% urls.forEach(url => {  %>
       <tr>
         <td><img src="/bow.png" alt="Hello kitty bow" width="35px"></td>
-        <td class="index-short-url"><%= url.shortURL%></td>
+        
+        <td class="index-short-url"><a href=<%=url.longURL%>><%= url.shortURL%></a></td>
         <td>=></td>
-        <td class="index-long-url"><%= url.longURL %></td>
+        <td class="index-long-url"><a href=<%=url.longURL%>><%= url.longURL%></a></td>
         <td class="table-actions">
           <a href=<%="/urls/"+url.shortURL%>>edit</a> |
           <a href=<%="/urls/"+url.shortURL+"/delete"%>>delete</a>
