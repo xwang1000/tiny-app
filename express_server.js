@@ -141,8 +141,12 @@ app.post('/urls/:shortURL', (req, res) => {
 
 // Redirect any requests to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL
-  res.redirect(longURL)
+  const urls = getEntriesByPropertyValue(urlDatabase, 'shortURL', req.params.shortURL)
+  if (urls.length === 0) {
+    res.status(404).send('Cannot find corresponding website.')
+  } else {
+    res.redirect(urls[0].longURL)
+  }
 })
 
 app.get('/login', (req, res) => {
