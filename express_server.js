@@ -1,6 +1,6 @@
 // Modules
 const express = require("express")
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
 const bodyParser = require("body-parser")
 const morgan = require('morgan')
 const colors = require('colors')
@@ -17,7 +17,10 @@ var app = express()
 app.use(bodyParser.urlencoded({extended: true}))
 
 // Parse cookies
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}))
 
 // Set static assets folder
 app.use(express.static('public'))
@@ -28,12 +31,11 @@ app.set('view engine', 'ejs')
 // Request logging
 app.use(morgan('dev'))
 
-
 // Hash passwords
 const bcrypt = require('bcrypt')
 
 const isAuthenticated = (req, res, next) => {
-  if (req.cookies.user) {
+  if (req.session.user) {
     next()
   } else {
     res.redirect('/login')
@@ -53,26 +55,23 @@ const users = {
   "user13f": {
     id: "user13f", 
     email: "user@example.com", 
-    // password: "purple-monkey-dinosaur",
     hashedPassword: '$2b$10$fLYN.YS4EAw6r/BzUkZJc.hrA1koedYbCde8jGQr36XI.B5BOJ3VO'
   },
  "user2134": {
     id: "user2134", 
     email: "user2@example.com", 
-    // password: "dishwasher-funk",
     hashedPassword: '$2b$10$8tHsU7IJha.iJ1LCPG0kduFro0irgFyyPC4NEf6cUqrA/KJOZ1g8K'
   },
   'user345': {
     id: 'user345',
     email: 'test@test.com',
-    // password: 'test',
     hashedPassword: '$2b$10$ptFE3.YmcQLD752INKjcR.55HKpWcE7aZzkehKimR3ibQyUs/keWW'
   }
 }
 
 app.use((req, res, next) => {
   res.locals = {
-    user: req.cookies['user']
+    user: req.session.user
   }
   next()
 })
@@ -90,8 +89,8 @@ app.get("/urls.json", (req, res) => {
 // Protect the route using middleware
 app.get("/urls", isAuthenticated, (req, res) => {
   res.render('urls_index', {
-    urls: getEntriesByPropertyValue(urlDatabase, 'userID', req.cookies.user.id),
-    user: req.cookies.user
+    urls: getEntriesByPropertyValue(urlDatabase, 'userID', req.session.user.id),
+    user: req.session.user
   })
 })
 
@@ -102,13 +101,13 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     shortURL,
     longURL: req.body.longURL, 
-    userID: req.cookies.user.id
+    userID: req.session.user.id
   }
   res.redirect('/urls/' + shortURL)
 })
 
 app.get("/urls/new", (req, res) => {
-  const {user} = req.cookies
+  const user = req.session.user
   if (user) {
     res.render("urls_new", {errors})
   } else {
@@ -126,7 +125,8 @@ app.get('/urls/:shortURL/delete', isAuthenticated, (req,res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params
   const urls = getEntriesByPropertyValue(urlDatabase, 'shortURL', shortURL)
-  const currentUser = req.cookies.user
+  const currentUser = req.session.user
+  
   // If going to an non-existent record
   if (urls.length === 0) {
     errors.push(`The short url ${shortURL} does not exist.`)
@@ -144,7 +144,6 @@ app.post('/urls/:shortURL', (req, res) => {
   const {longURL} = req.body
   const {shortURL} = req.params
 
-  // console.log(urlDatabase[shortURL].longURL)
   urlDatabase[shortURL].longURL = longURL
   res.redirect('/urls')
 })
@@ -174,7 +173,7 @@ app.post('/login', (req, res) => {
 
     if (bcrypt.compareSync(password, currentUser.hashedPassword)) 
     {
-      res.cookie('user', currentUser)
+      req.session.user = currentUser
       res.redirect('/urls')
     } else {
       res.status(403).send('Wrong password.')
@@ -182,8 +181,9 @@ app.post('/login', (req, res) => {
   }
 })
 
+// Clean session cookie
 app.post('/logout', (req, res) => {
-  res.clearCookie('user')
+  req.session.user = null
   res.redirect('/urls')
 })
 
@@ -212,8 +212,9 @@ app.post('/register', (req, res) => {
     email,
     hashedPassword: bcrypt.hashSync(password, 10)
   }
+  
   // set cookie
-  res.cookie('user', users[newID])
+  req.session.user = users[newID]
   res.redirect('/urls')
 })
 
