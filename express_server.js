@@ -28,6 +28,10 @@ app.set('view engine', 'ejs')
 // Request logging
 app.use(morgan('dev'))
 
+
+// Hash passwords
+const bcrypt = require('bcrypt')
+
 const isAuthenticated = (req, res, next) => {
   if (req.cookies.user) {
     next()
@@ -49,17 +53,20 @@ const users = {
   "user13f": {
     id: "user13f", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    // password: "purple-monkey-dinosaur",
+    hashedPassword: '$2b$10$fLYN.YS4EAw6r/BzUkZJc.hrA1koedYbCde8jGQr36XI.B5BOJ3VO'
   },
  "user2134": {
     id: "user2134", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    // password: "dishwasher-funk",
+    hashedPassword: '$2b$10$8tHsU7IJha.iJ1LCPG0kduFro0irgFyyPC4NEf6cUqrA/KJOZ1g8K'
   },
   'user345': {
     id: 'user345',
     email: 'test@test.com',
-    password: 'test'
+    // password: 'test',
+    hashedPassword: '$2b$10$ptFE3.YmcQLD752INKjcR.55HKpWcE7aZzkehKimR3ibQyUs/keWW'
   }
 }
 
@@ -91,7 +98,9 @@ app.get("/urls", isAuthenticated, (req, res) => {
 // Needs revision -> creating new url form
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString()
+
   urlDatabase[shortURL] = {
+    shortURL,
     longURL: req.body.longURL, 
     userID: req.cookies.user.id
   }
@@ -118,7 +127,6 @@ app.get("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params
   const urls = getEntriesByPropertyValue(urlDatabase, 'shortURL', shortURL)
   const currentUser = req.cookies.user
-  console.log(currentUser)
   // If going to an non-existent record
   if (urls.length === 0) {
     errors.push(`The short url ${shortURL} does not exist.`)
@@ -157,13 +165,14 @@ app.post('/login', (req, res) => {
   const {email, password} = req.body
 
   // find user using email
-  const currentUser = getUserByEmail(email)
+  const [currentUser] = getEntriesByPropertyValue(users, 'email', email)
 
   if(!currentUser) {
     res.status(403).send(`Cannot find user registered with ${email}.`)
   } else {
-    // check if the input password === user.password
-    if (password === currentUser.password) {
+
+    if (bcrypt.compareSync(password, currentUser.hashedPassword)) 
+    {
       res.cookie('user', currentUser)
       res.redirect('/urls')
     } else {
@@ -195,15 +204,15 @@ app.post('/register', (req, res) => {
     res.status(400).send('This email already exists.')
     next()   
   }
-  const newId = getUId()
+  const newID = getUId()
   // add user
-  users[newId] = {
-    id: newId,
+  users[newID] = {
+    id: newID,
     email,
-    password
+    hashedPassword: bcrypt.hashSync(password, 10)
   }
   // set cookie
-  res.cookie('user', users[newId])
+  res.cookie('user', users[newID])
   res.redirect('/urls')
 })
 
@@ -230,27 +239,6 @@ const isEmailExisiting = email => {
   }
   return false
 }
-
-const getUserByEmail = email => {
-  for (const userId in users) {
-    if (users.hasOwnProperty(userId) && email === users[userId].email) {
-      return users[userId]
-    }
-  }
-  return undefined
-}
-
-// Could be more eloquent using Array.reduce()
-// Look up with given userID, return a list of visible url objects
-// const getVisibleUrls = userID => {
-//   const visibleUrls = []
-//   for (const urlID in urlDatabase) {
-//     if (urlDatabase.hasOwnProperty(urlID) && userID === urlDatabase[urlID].userID) {
-//       visibleUrls.push(urlDatabase[urlID])
-//     }
-//   }
-//   return visibleUrls
-// }
 
 const objectToArray = object => (Object.keys(object).map(key => object[key]))
 
